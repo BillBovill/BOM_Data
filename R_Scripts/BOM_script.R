@@ -22,7 +22,8 @@ separate(BOM_Data, Temp_min_max, into = c("T_Min", "T_Max"), sep = "/") -> BOM_D
 BOM_Data %>%
   mutate(T_Min = as.numeric(T_Min)) %>% 
   mutate(T_Max = as.numeric(T_Max)) %>% 
-  mutate(Rainfall = as.numeric(Rainfall))-> BOM_Data
+  mutate(Rainfall = as.numeric(Rainfall)) %>% 
+  mutate(Solar_exposure = as.numeric(Solar_exposure)) -> BOM_Data
 
 #This gives which stations which have data for each column individually
 BOM_Data %>% 
@@ -74,7 +75,7 @@ BOM_Stations %>%
   mutate(lat = as.numeric(lat)) %>% 
   mutate(lon = as.numeric(lon)) %>% 
   mutate(name = as.character(name)) %>% 
-  mutate(start = as.numeric(start)) %>% 
+  mutate(start = as.numeric(start)) %>%
   mutate(state = as.character(state)) -> BOM_Stations
 
 #joining both objects
@@ -90,3 +91,16 @@ BOM_Combined %>%
 #Question 4
 #Does the westmost (lowest longitude) or eastmost (highest longitude)
 #weather station in our dataset have a higher average solar exposure?
+
+#This answers question, but returns NaN for station 86344
+BOM_Combined %>%
+  group_by(Station_number) %>%
+  summarise(mean_lon = mean(lon, na.rm = TRUE),
+            ave_sol_exp = mean(Solar_exposure, na.rm = TRUE)) %>% 
+  arrange(mean_lon)
+
+
+#NaN for station 86344 is because there is no Solar_exposure data for this station
+BOM_Combined %>% 
+  filter(Station_number == 86344 & Solar_exposure != NA) 
+  
